@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# LaTeX build output directory
+build/
+
+# Exception: keep PDF files in report/build/
+!report/build/
+report/build/*
+!report/build/*.pdf
+
+# Common LaTeX auxiliary files
+*.aux
+*.log
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.lof
+*.lot
+
+# OS files
+.DS_Store
+Thumbs.db
