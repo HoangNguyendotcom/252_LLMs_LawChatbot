@@ -1,0 +1,35 @@
+\section{Giới thiệu mô tả bài toán}
+
+Trong bối cảnh ngày càng gia tăng lượng dữ liệu văn bản số, việc truy xuất thông tin chính xác từ các nguồn dữ liệu lớn trở nên cực kỳ quan trọng. Bài toán nghiên cứu trong báo cáo này liên quan đến việc xây dựng một hệ thống \textbf{RAG (Retrieval-Augmented Generation)}, kết hợp khả năng truy xuất thông tin từ kho dữ liệu với khả năng sinh ngôn ngữ của các mô hình ngôn ngữ lớn (LLM). Mục tiêu cụ thể là xây dựng một hệ thống \textbf{Chatbot Hỏi đáp Pháp luật} (Legal Question Answering Chatbot) thông qua việc áp dụng và tối ưu hóa kiến trúc Retrieval-Augmented Generation (RAG).
+
+\subsection{RAG là gì?}
+
+\textbf{RAG (Retrieval-Augmented Generation)} là một phương pháp kết hợp hai thành phần chính:
+
+\begin{itemize}
+  \item \textbf{Retrieval (Truy xuất thông tin):} Hệ thống tìm kiếm các văn bản, đoạn thông tin liên quan từ một kho dữ liệu lớn (ví dụ: các file pháp lý, cặp câu hỏi--đáp) dựa trên truy vấn của người dùng. Các kỹ thuật phổ biến bao gồm FAISS vector search, BM25 hoặc hybrid search kết hợp nhiều phương pháp.
+
+  \item \textbf{Generation (Sinh ngôn ngữ):} Một mô hình ngôn ngữ lớn (LLM) sử dụng thông tin đã được truy xuất để tạo ra câu trả lời tự nhiên, mạch lạc và phù hợp với ngữ cảnh truy vấn.
+\end{itemize}
+
+Phương pháp RAG cho phép mô hình LLM không chỉ dựa trên kiến thức nội bộ đã học, mà còn khai thác dữ liệu bên ngoài, giúp nâng cao độ chính xác, khả năng cập nhật và tính đầy đủ của câu trả lời.
+
+\subsection{Bài toán}
+
+Mục tiêu của hệ thống RAG trong báo cáo này là:
+
+\begin{enumerate}
+  \item Truy xuất thông tin chính xác từ các \textbf{văn bản pháp lý} và \textbf{cặp câu hỏi--đáp RES} dựa trên truy vấn của người dùng.
+  \item Sử dụng các mô hình LLM (ví dụ: Qwen1.5-1.8B, Qwen3-1.7B) để sinh câu trả lời chi tiết, chính xác và phù hợp với ngữ cảnh.
+  \item So sánh hiệu quả của các chiến lược truy xuất (FAISS, BM25, hybrid search, reranking) và các mô hình LLM khác nhau dựa trên các chỉ số đánh giá như Cosine Similarity, Jaccard Similarity, Token Overlap, BLEU Score và ROUGE-L.
+\end{enumerate}
+
+\subsection{Ý nghĩa và ứng dụng}
+
+Hệ thống RAG được xây dựng có thể áp dụng trong nhiều lĩnh vực, đặc biệt là trong môi trường pháp lý, nơi cần truy xuất và tổng hợp thông tin chính xác từ khối lượng văn bản lớn. Các lợi ích chính bao gồm:
+
+\begin{itemize}
+  \item Cải thiện chất lượng câu trả lời so với việc chỉ dựa vào mô hình LLM.
+  \item Cho phép truy xuất thông tin cập nhật từ dữ liệu bên ngoài mà không cần huấn luyện lại mô hình.
+  \item Hỗ trợ người dùng trong việc tra cứu, phân tích và đưa ra quyết định dựa trên dữ liệu pháp lý hoặc Q\&A chuyên ngành.
+\end{itemize}

@@ -1,0 +1,104 @@
+\section{Triển khai}
+
+Quá trình hiện thực hệ thống RAG được tiến hành trên môi trường Google Colab. Do hạn chế về tài nguyên phần cứng (RAM và VRAM) khi phải đồng thời tải cả Vector Database, Embedding Model và LLM, đề xuất chia quá trình triển khai thành hai giai đoạn độc lập: (1) Xây dựng dữ liệu và Truy xuất ngữ cảnh và (2) Sinh câu trả lời.
+
+\subsection{Xây dựng Vector Database và cấu hình Embedding}
+
+Giai đoạn đầu tiên là chuyển đổi dữ liệu văn bản pháp luật thành các vector đặc trưng sử dụng LangChain và FAISS:
+
+\begin{itemize}
+  \item \textbf{Xử lý dữ liệu:} Chunking với \texttt{chunk\_size=1024}.
+  \item \textbf{Embedding Model:} \texttt{keepitreal/vietnamese-sbert} với cấu hình chuẩn hóa vector.
+  \item \textbf{Vector Store:} FAISS với \texttt{DistanceStrategy.COSINE}.
+\end{itemize}
+
+\subsection{Cấu hình Embedding và FAISS}
+
+\begin{lstlisting}[language=Python, caption={Cấu hình Embedding và khởi tạo FAISS với Cosine Strategy}]
+encode_kwargs = {"normalize_embeddings": True}
+
+embeddings = HuggingFaceEmbeddings(
+    model_name="keepitreal/vietnamese-sbert",
+    model_kwargs={"device": "cuda"},
+    encode_kwargs=encode_kwargs
+)
+
+vectorstore = FAISS.from_documents(
+    documents=batch_docs,
+    embedding=embeddings,
+    distance_strategy=DistanceStrategy.COSINE
+)
+\end{lstlisting}
+
+\subsection{Chiến lược truy xuất Hybrid và tối ưu hóa tài nguyên}
+
+Thay vì truy xuất trực tiếp trong lúc sinh câu trả lời (Online Retrieval), thực hiện \textit{Pre-computation} ngữ cảnh cho toàn bộ tập dữ liệu kiểm thử (RES Dataset) trước, nhằm tránh tình trạng OOM khi tải LLM.
+
+\subsubsection{Cơ chế Hybrid Search kết hợp Rerank}
+
+Xây dựng lớp \texttt{HybridFAISSBM25Searcher} kết hợp Dense Retrieval (FAISS) và Lexical Retrieval (BM25), sau đó rerank bằng \texttt{BAAI/bge-reranker-large}:
+
+\begin{lstlisting}[language=Python, caption={Lớp HybridFAISSBM25Searcher}]
+class HybridFAISSBM25Searcher:
+
+    def _hybrid_search(self, query, top_k, dense_k, alpha):
+        dense_results = self.faiss_db.similarity_search_with_score(
+            query, k=dense_k
+        )
+        bm25_scores = self.bm25.get_scores(self.fast_tokenize(query))
+        # score = alpha * dense + (1 - alpha) * lexical
+        return results[:top_k]
+
+    def _rerank(self, query, docs, top_k):
+        pairs = [(query, doc.page_content) for doc in docs]
+        scores = self.reranker.predict(pairs)
+        return ranked[:top_k]
+\end{lstlisting}
+
+\subsubsection{Lưu trữ ngữ cảnh (Context Caching)}
+
+Truy xuất ngữ cảnh cho toàn bộ câu hỏi và lưu vào file trung gian \texttt{res\_with\_context.csv} với các cột:
+
+\begin{itemize}
+  \item \texttt{context\_baseline}: Ngữ cảnh từ truy xuất cơ bản.
+  \item \texttt{context\_hybrid}: Ngữ cảnh từ FAISS + BM25.
+  \item \texttt{context\_hybrid\_rerank}: Ngữ cảnh sau bước Reranker.
+\end{itemize}
+
+\begin{lstlisting}[language=Python, caption={Lưu trữ ngữ cảnh vào file CSV trung gian}]
+contexts_rerank = []
+for question in tqdm(df["Cau Hoi"], desc="Building contexts"):
+    results = searcher.search(
+        query=question, use_rerank=True, rerank_k=10
+    )
+    contexts_rerank.append(build_context(results))
+
+df["context_hybrid_rerank"] = contexts_rerank
+df.to_csv("res_with_context.csv", index=False)
+\end{lstlisting}
+
+\subsection{Giai đoạn Sinh (Generation) với LLM}
+
+Sau khi giải phóng bộ nhớ khỏi Vector Store và Embedding Model, tải mô hình \texttt{Qwen/Qwen3-1.7B} để sinh câu trả lời từ ngữ cảnh đã được chuẩn bị sẵn:
+
+\begin{lstlisting}[language=Python, caption={Khởi tạo LLM và hàm RAG query với Prompt Grounding}]
+llm = HuggingFacePipeline.from_model_id(
+    model_id="Qwen/Qwen3-1.7B",
+    task="text-generation",
+    device=0,
+    model_kwargs={"temperature": 0, "max_length": 1024}
+)
+
+def rag_query(question, context):
+    prompt = f"""Ban la mot tro ly thong minh.
+Tra loi cau hoi dua tren ngu canh sau.
+Neu khong du thong tin, hay noi ro dieu do,
+khong duoc tu bia dat.
+
+Ngu canh: {context}
+Cau hoi: {question}
+Tra loi ngan gon va chinh xac nhat co the:"""
+
+    output = llm.generate([prompt], max_new_tokens=256)
+    return output.generations[0][0].text
+\end{lstlisting}

@@ -1,0 +1,184 @@
+\documentclass[12pt]{article}
+\usepackage{lastpage}
+
+% --- Page layout ---
+\usepackage[a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=4cm]{geometry}
+
+% --- Vietnamese support ---
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese]{babel}
+
+% --- Math & fonts ---
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{mathptmx}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{diagbox}
+
+% --- Graphics ---
+\usepackage{graphicx}
+\usepackage{float}
+
+% --- Code listings ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=Python,
+    backgroundcolor=\color{black!10},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{cyan},
+    stringstyle=\color{orange},
+    commentstyle=\color{gray},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+}
+
+% --- Misc ---
+\usepackage{fancyhdr}
+\usepackage{multicol}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{amsthm}
+
+\sloppy
+
+\hypersetup{urlcolor=blue, linkcolor=black, citecolor=black, colorlinks=true}
+
+% --- Theorem styles ---
+\renewcommand{\figurename}{Hình}
+\theoremstyle{definition}
+\newtheorem{theorem}{{\bf Định lý}}
+\newtheorem{definition}[theorem]{Định nghĩa}
+\newtheorem{example}{Ví dụ}[section]
+
+% --- TOC / Ref names ---
+\AtBeginDocument{\renewcommand*\contentsname{Mục lục}}
+\AtBeginDocument{\renewcommand*\refname{Tài liệu tham khảo}}
+
+% --- Header / Footer ---
+\setlength{\parindent}{2em}
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[L]{
+  \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+      \put(0,-8){\includegraphics[width=14mm, height=10mm]{hcmut.png}}
+    \end{picture}&
+    \begin{tabular}{l}
+      \textbf{\bf \ttfamily Đại học Quốc gia Thành phố Hồ Chí Minh}\\
+      \textbf{\bf \ttfamily Trường Đại học Bách Khoa}\\
+    \end{tabular}
+  \end{tabular}
+}
+\fancyhead[R]{
+  \begin{tabular}{l}
+    \tiny \bf \\
+    \tiny \bf
+  \end{tabular}
+}
+\fancyfoot{}
+\fancyfoot[L]{\scriptsize \ttfamily Retrieval Augmented Generation -- HV: Nguyễn Đắc Hoàng -- MSHV: 2470081}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
+% --- Section depth ---
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% ==================== TITLE PAGE ====================
+\begin{titlepage}
+
+\begin{center}
+  \text{\Large Đại học Quốc gia Thành phố Hồ Chí Minh} \\
+  \text{\Large Trường Đại học Bách Khoa} \\
+  \text{\Large Khoa Khoa học và Kỹ thuật Máy Tính} \\
+\end{center}
+
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=9cm]{hcmut.png}
+  \end{center}
+\end{figure}
+
+\begin{center}
+  \begin{tabular}{c}
+    \textbf{{\large RETRIEVAL AUGMENTED GENERATION ASSIGNMENT}} \\
+    \hline
+    \\
+    \text{\Huge Đề tài:} \\
+    \\
+    \textbf{{\large A SIMPLE LAW CHATBOT}} \\
+    \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\begin{table}[h]
+  \centering
+  \LARGE
+  \textbf{Giảng viên:} Dr. Quản Thành Thơ
+  \\[1em]
+  \textbf{Học viên:} Nguyễn Đắc Hoàng
+  \\[1em]
+  \textbf{MSHV:} 2470081
+\end{table}
+
+\vspace{1.5cm}
+\begin{center}
+  {\large Thành phố Hồ Chí Minh, 4/2026}
+\end{center}
+
+\end{titlepage}
+
+% ==================== TABLE OF CONTENTS ====================
+\newpage
+\renewcommand{\contentsname}{Mục lục}
+\tableofcontents{}
+
+% ==================== SECTIONS ====================
+\newpage
+
+\input{sections/01_intro/text}
+\input{sections/02_data_eval/text}
+\input{sections/03_methods/text}
+\input{sections/04_implementation/text}
+\input{sections/05_conclusion/text}
+\input{sections/06_limitations/text}
+
+% ==================== REFERENCES ====================
+\newpage
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\bibliographystyle{ieeetr}
+\bibliography{ref}
+
+% ==================== END ====================
+\newpage
+\begin{center}
+  {
+    \hspace{0pt}
+    \vfill
+    \LARGE THIS IS THE END OF THE REPORT
+    \vfill
+    \hspace{0pt}
+  }
+\end{center}
+
+\end{document}

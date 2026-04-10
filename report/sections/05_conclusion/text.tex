@@ -1,0 +1,51 @@
+\section{Kết luận}
+
+Báo cáo này đã trình bày chi tiết quá trình xây dựng, tối ưu hóa và đánh giá một hệ thống RAG dành cho lĩnh vực pháp luật Việt Nam. Hệ thống được phát triển nhằm cung cấp câu trả lời chính xác, dựa trên ngữ cảnh từ kho văn bản luật lớn, đồng thời thiết lập một quy trình triển khai ổn định trên môi trường tài nguyên hạn chế.
+
+\subsection{Kết quả tổng thể}
+
+\begin{table}[H]
+\centering
+\caption{So sánh chỉ số đánh giá: Baseline vs. Hệ thống tối ưu hóa}
+\begin{tabular}{lcc}
+  \toprule
+  \textbf{Chỉ số} & \textbf{Hệ thống ban đầu} & \textbf{Hệ thống tối ưu hóa} \\
+  \midrule
+  Cosine Similarity  & 0.6871 & \textbf{0.7026} \\
+  Jaccard Similarity & 0.2335 & \textbf{0.2447} \\
+  Token Overlap      & 0.6716 & \textbf{0.7173} \\
+  BLEU Score         & 0.1615 & \textbf{0.1691} \\
+  ROUGE-L            & 0.1215 & \textbf{0.1310} \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+Hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine Distance, chunk size 1024, Qwen3-1.7B) cải thiện đồng bộ trên tất cả các chỉ số so với baseline (Qwen1.5-1.8B, chunk size 2000, L2 Distance), thể hiện sự nâng cao chất lượng câu trả lời một cách toàn diện.
+
+\begin{itemize}
+  \item \textbf{Cosine Similarity} ($0.6871 \to 0.7026$): Ngữ cảnh truy hồi phù hợp hơn nhờ Hybrid Search + Rerank; mô hình Qwen3-1.7B hiểu và diễn đạt đúng ý nghĩa câu hỏi tốt hơn.
+  \item \textbf{Jaccard Similarity} ($0.2335 \to 0.2447$): Câu trả lời chứa nhiều thuật ngữ và từ khóa quan trọng giống với câu trả lời chuẩn hơn.
+  \item \textbf{Token Overlap} ($0.6716 \to 0.7173$): Chỉ số tăng mạnh nhất -- hệ thống truy hồi được đoạn văn chứa thông tin đúng trọng tâm, giảm tình trạng hallucination.
+  \item \textbf{BLEU Score} ($0.1615 \to 0.1691$): Cấu trúc câu và cách diễn đạt gần hơn với câu trả lời chuẩn.
+  \item \textbf{ROUGE-L} ($0.1215 \to 0.1310$): Câu trả lời có bố cục logic và trình tự nội dung gần với câu trả lời chuẩn hơn.
+\end{itemize}
+
+\subsection{Tóm tắt kết quả đạt được}
+
+\begin{enumerate}
+  \item \textbf{Tối ưu hóa truy xuất:}
+  \begin{itemize}
+    \item Xác định chiến lược Chunking tối ưu (\texttt{chunk\_size=1024}) và Cosine Similarity để tăng độ chính xác truy xuất ngữ nghĩa.
+    \item Triển khai thành công \textbf{Hybrid Search (FAISS + BM25)} kết hợp \textbf{Rerank} (\texttt{BAAI/bge-reranker-large}).
+  \end{itemize}
+
+  \item \textbf{Cải thiện chất lượng sinh:}
+  \begin{itemize}
+    \item Giải quyết vấn đề sinh văn bản tiếng Việt kém chất lượng bằng cách chuyển sang \texttt{Qwen3-1.7B}.
+  \end{itemize}
+
+  \item \textbf{Giải pháp triển khai thực tế:}
+  \begin{itemize}
+    \item Hiện thực chiến lược \textbf{Context Pre-computation} (tách biệt Retrieval và Generation) khắc phục triệt để vấn đề giới hạn tài nguyên Google Colab.
+  \end{itemize}
+\end{enumerate}

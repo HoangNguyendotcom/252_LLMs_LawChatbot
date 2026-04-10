@@ -1,0 +1,166 @@
+\section{Phương pháp cải tiến RAG so với baseline}
+
+Việc xây dựng hệ thống RAG hiệu quả cho dữ liệu pháp lý đòi hỏi sự tối ưu hóa đồng thời ở cả hai giai đoạn: Truy xuất (Retrieval) và Sinh (Generation). Ta tiến hành cải tiến hệ thống theo từng bước có kiểm soát, dựa trên việc đánh giá định lượng hiệu suất của từng thành phần trong pipeline.
+
+\subsection{Phân tích Pipeline RAG hiện tại}
+
+Pipeline RAG cơ bản được hiện thực trong file \texttt{baseline.py}, tuân theo cấu trúc ba giai đoạn tiêu chuẩn: \textit{Indexing}, \textit{Retrieval} và \textit{Generation}.
+
+\subsubsection{Hạn chế của giai đoạn Indexing và Retrieval}
+
+\begin{itemize}
+  \item \textbf{Khoảng cách đo (Distance Metric) chưa tối ưu:} Pipeline cơ bản sử dụng FAISS với khoảng cách Euclidean (L2) mặc định. Tuy nhiên, với các vector embedding đã được chuẩn hóa, Cosine Similarity thường cung cấp thước đo độ tương đồng ngữ nghĩa chính xác hơn.
+
+  \item \textbf{Phụ thuộc duy nhất vào Semantic Search:} Dữ liệu pháp luật đòi hỏi độ chính xác cao về điều khoản, tên luật và cụm từ pháp lý. Việc chỉ dựa vào tìm kiếm vector có thể bỏ sót các tài liệu quan trọng nếu vector ngữ nghĩa bị nhiễu.
+
+  \item \textbf{Lựa chọn Chunking và Embedding Model chưa tối ưu:} Các tham số như kích thước chunk size và mô hình embedding cần được đánh giá lại để đảm bảo tính phù hợp với đặc thù ngôn ngữ pháp lý tiếng Việt.
+\end{itemize}
+
+\subsubsection{Hạn chế của giai đoạn Generation}
+
+\begin{itemize}
+  \item \textbf{Chất lượng đầu vào của LLM:} Ngữ cảnh nhiễu, thiếu thông tin hoặc chứa mâu thuẫn có thể dẫn đến hiện tượng suy diễn sai (hallucination).
+  \item \textbf{Prompt Engineering:} Prompt template cơ bản chưa đủ mạnh để đảm bảo khả năng định hướng (grounding), khiến mô hình có thể trả lời vượt ra ngoài phạm vi thông tin được cung cấp.
+\end{itemize}
+
+\subsubsection{Hạn chế về môi trường triển khai}
+
+\begin{itemize}
+  \item \textbf{Giới hạn tài nguyên trên Google Colab:} Mô hình yêu cầu tải đồng thời Vector Store (FAISS), Embedding Model và LLM, dễ dẫn đến lỗi \textit{Out of Memory} (OOM).
+\end{itemize}
+
+\subsection{Chiến lược cải tiến}
+
+Dựa trên các phân tích trên, ta xây dựng chiến lược cải tiến tập trung vào ba trụ cột chính:
+
+\begin{itemize}
+  \item \textbf{Tối ưu hóa tham số Indexing:} Xác định Chunk Size và khoảng cách đo lường phù hợp nhất.
+  \item \textbf{Tăng cường truy xuất nâng cao:} Áp dụng Hybrid Search kết hợp FAISS và BM25, cùng với bước Reranking.
+  \item \textbf{Tối ưu hóa triển khai:} Thực hiện chiến lược \textit{Context Pre-computation} nhằm giải quyết vấn đề giới hạn tài nguyên.
+\end{itemize}
+
+\subsubsection{Chọn mô hình embedding}
+
+Tiến hành so sánh các mô hình embedding dựa trên Cosine Similarity với 10 cặp Q\&A đầu tiên trong \texttt{res.csv}:
+
+\begin{table}[H]
+\centering
+\caption{So sánh Mean Cosine Similarity giữa các mô hình embedding}
+\begin{tabular}{lc}
+  \toprule
+  \textbf{Mô hình} & \textbf{Mean Cosine Similarity} \\
+  \midrule
+  \texttt{BAAI/bge-m3}                        & 0.876006 \\
+  \texttt{keepitreal/vietnamese-sbert}         & 0.858670 \\
+  \texttt{huyydangg/DEk21\_hcmute\_embedding}  & 0.812371 \\
+  \texttt{AITeamVN/Vietnamese\_Embedding}      & 0.782572 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+Mô hình \texttt{BAAI/bge-m3} có kết quả tốt nhất (0.876006) nhưng yêu cầu tài nguyên tính toán lớn, không thể chạy hiệu quả trên Colab cùng LLM. Mô hình \texttt{keepitreal/vietnamese-sbert} (0.858670) nhẹ hơn và ổn định hơn, phù hợp với môi trường tài nguyên hạn chế. Do đó, \textbf{\texttt{keepitreal/vietnamese-sbert}} được chọn làm mô hình embedding chính.
+
+\subsubsection{Giảm độ dài chunk size}
+
+Thử nghiệm giảm chunk size từ 2000 xuống 1024:
+
+\begin{table}[H]
+\centering
+\caption{So sánh các chỉ số đánh giá theo độ dài chunk size}
+\begin{tabular}{lcc}
+  \toprule
+  \textbf{Chỉ số} & \textbf{Chunk size = 1024} & \textbf{Chunk size = 2000 (baseline)} \\
+  \midrule
+  Cosine Similarity  & 0.6871          & 0.6867          \\
+  Jaccard Similarity & 0.2335          & 0.1961          \\
+  Token Overlap      & 0.6716          & \textbf{0.7434} \\
+  BLEU Score         & 0.1615          & 0.1041          \\
+  ROUGE-L            & 0.1215          & 0.0899          \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+Chunk size = 1024 cải thiện hầu hết các chỉ số, ngoại trừ Token Overlap giảm nhẹ do chunk nhỏ hơn làm giảm số lượng token chung giữa các đoạn văn dài. Do đó, \textbf{chunk size = 1024} được chọn cho các thí nghiệm tiếp theo.
+
+\subsubsection{Thay đổi chiến lược trong Faiss từ mặc định sang Cosine}
+
+Các mô hình embedding được huấn luyện để so sánh độ tương đồng dựa trên Cosine Similarity, do đó việc tiếp tục sử dụng khoảng cách Euclidean mặc định sẽ không phản ánh chính xác mức độ tương đồng ngữ nghĩa. Thay đổi được thực hiện như sau:
+
+\begin{lstlisting}[language=Python, caption={Thay đổi distance strategy trong FAISS sang Cosine}]
+vectorstore = FAISS.from_documents(
+    documents=batch_docs,
+    embedding=embeddings,
+    distance_strategy=DistanceStrategy.COSINE  # <- bo sung
+)
+\end{lstlisting}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả đánh giá khi sử dụng Cosine distance trong Faiss (chunk size = 1024)}
+\begin{tabular}{lc}
+  \toprule
+  \textbf{Chỉ số đánh giá} & \textbf{Giá trị} \\
+  \midrule
+  Cosine Similarity  & 0.6980 \\
+  Jaccard Similarity & 0.2352 \\
+  Token Overlap      & 0.6683 \\
+  BLEU Score         & 0.1635 \\
+  ROUGE-L            & 0.1232 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Thay đổi mô hình LLM từ Qwen1.5-1.8B sang Qwen3-1.7B}
+
+Mô hình \texttt{Qwen1.5-1.8B} tồn tại nhiều hạn chế trong việc sinh văn bản tiếng Việt: các câu trả lời thường thiếu tự nhiên, sai ngữ pháp, hoặc xuất hiện hiện tượng pha trộn giữa tiếng Việt và tiếng Trung. Do đó, quyết định thay thế bằng \texttt{Qwen3-1.7B} -- phiên bản được huấn luyện với tập dữ liệu đa ngôn ngữ phong phú hơn và hỗ trợ tiếng Việt tốt hơn.
+
+% Thêm hình minh họa nếu có: \includegraphics[width=\textwidth]{03.methods/img/qwen15_output.png}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả Qwen3-1.7B (Cosine distance, chunk size = 1024)}
+\begin{tabular}{lc}
+  \toprule
+  \textbf{Chỉ số} & \textbf{Qwen3-1.7B} \\
+  \midrule
+  Cosine Similarity  & 0.6980 \\
+  Jaccard Similarity & 0.2400 \\
+  Token Overlap      & 0.7007 \\
+  BLEU Score         & 0.1664 \\
+  ROUGE-L            & 0.1274 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sử dụng Hybrid Search + Rerank}
+
+\textbf{Hybrid Search} kết hợp điểm số từ hai phương pháp:
+\begin{itemize}
+  \item \textbf{Dense Retrieval (FAISS):} Ưu tiên sự tương đồng về \textbf{ngữ nghĩa}.
+  \item \textbf{Lexical Retrieval (BM25):} Ưu tiên sự tương đồng về \textbf{từ khóa}.
+\end{itemize}
+
+Điểm số cuối cùng được tính theo công thức:
+\[
+  \text{Score}_{\text{Hybrid}} = \alpha \cdot \text{Score}_{\text{Dense}} + (1 - \alpha) \cdot \text{Score}_{\text{Lexical}}
+\]
+
+Sau đó, bước \textbf{Rerank} dùng mô hình Cross-Encoder (\texttt{BAAI/bge-reranker-large}) để tinh chỉnh thứ hạng, loại bỏ các tài liệu nhiễu trước khi đưa vào LLM.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả Qwen3-1.7B với Hybrid Search và Hybrid Search + Rerank}
+\begin{tabular}{lccc}
+  \toprule
+  \textbf{Chỉ số} & \textbf{Hybrid Search} & \textbf{Hybrid Search + Rerank} \\
+  \midrule
+  Cosine Similarity  & 0.6993 & \textbf{0.7026} \\
+  Jaccard Similarity & 0.2413 & \textbf{0.2447} \\
+  Token Overlap      & 0.7149 & \textbf{0.7173} \\
+  BLEU Score         & 0.1685 & \textbf{0.1691} \\
+  ROUGE-L            & \textbf{0.1333} & 0.1310 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+Việc bổ sung rerank giúp cải thiện đáng kể các chỉ số, đặc biệt Cosine Similarity (từ 0.6993 lên 0.7026) và Token Overlap (từ 0.7149 lên 0.7173), chứng tỏ ngữ cảnh được truy xuất có tính tương đồng ngữ nghĩa cao hơn với câu trả lời chuẩn.

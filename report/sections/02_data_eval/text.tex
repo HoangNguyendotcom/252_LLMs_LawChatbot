@@ -1,0 +1,102 @@
+\section{Dữ liệu và chỉ số đánh giá}
+
+\subsection{Dữ liệu}
+
+Bài tập cung cấp hai tập dữ liệu chính để đánh giá hệ thống RAG:
+
+\begin{itemize}
+  \item \textbf{Legal Documents:} Tập hợp khoảng 16,440 file văn bản (\texttt{.txt}) bao phủ các lĩnh vực pháp lý khác nhau (ví dụ: dân sự, lao động, hành chính) từ nhiều cấp cơ quan khác nhau.
+
+  \item \textbf{RES Dataset (Questions and Answers):} Gồm khoảng 2,745 cặp câu hỏi--đáp dùng để đánh giá hệ thống RAG. Ít nhất 100 cặp phải được thử nghiệm và số lượng sử dụng cần được báo cáo trong bài nộp.
+\end{itemize}
+
+\subsubsection{Phân tích tập Legal Documents}
+
+Tập dữ liệu văn bản bao gồm tổng cộng \textbf{16,440 file .txt}. Khi phân tích độ dài từng văn bản, kết quả như sau:
+
+\begin{itemize}
+  \item Văn bản ngắn nhất có 144 từ, trong khi văn bản dài nhất lên tới 174,697 từ. Khoảng biến thiên lớn này đặt ra thách thức trong việc lựa chọn chiến lược cắt đoạn (chunking).
+  \item Độ dài trung bình của các văn bản là khoảng 4,188 từ với cấu trúc văn phong pháp lý chặt chẽ.
+\end{itemize}
+
+\subsubsection{Phân tích tập RES Dataset}
+
+Tập dữ liệu RES gồm \textbf{2,745 cặp câu hỏi--đáp}. Trong thí nghiệm này, sử dụng một \textbf{tập con gồm 100 cặp Q\&A} đầu tiên để đánh giá:
+
+\begin{itemize}
+  \item \textbf{Độ dài câu hỏi trung bình:} 31.9 từ.
+  \item \textbf{Độ dài câu trả lời trung bình:} 360.6 từ.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Thống kê cơ bản về văn bản và cặp Q\&A}
+\begin{tabular}{lc}
+  \toprule
+  \textbf{Chỉ số} & \textbf{Giá trị} \\
+  \midrule
+  Tổng số file .txt                         & 16,440   \\
+  Độ dài văn bản (số từ) -- nhỏ nhất        & 144      \\
+  Độ dài văn bản (số từ) -- lớn nhất        & 174,697  \\
+  Độ dài văn bản (số từ) -- trung bình      & 4,188.10 \\
+  Tổng số cặp Q\&A                          & 2,745    \\
+  Số cặp Q\&A sử dụng cho thí nghiệm        & 100      \\
+  Câu hỏi -- số từ trung bình               & 31.90    \\
+  Câu trả lời -- số từ trung bình           & 360.59   \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Nhận xét và đánh giá độ khó}
+
+Tổng thể, dữ liệu không chỉ có sự đa dạng về độ dài mà còn chứa đựng những thách thức đặc thù về mặt nội dung:
+
+\begin{itemize}
+  \item \textbf{Tính chất chuyên ngành cao:} Văn bản pháp luật sử dụng hệ thống thuật ngữ chuyên biệt, cấu trúc câu phức tạp. Điều này đòi hỏi mô hình Embedding phải có khả năng nắm bắt ngữ nghĩa sâu.
+  \item \textbf{Yêu cầu về độ chính xác:} Câu trả lời trong lĩnh vực pháp lý đòi hỏi tính chính xác tuyệt đối dựa trên điều luật. Việc ảo giác (hallucination) là không thể chấp nhận.
+\end{itemize}
+
+\subsection{Chỉ số đánh giá}
+
+Việc đánh giá chất lượng của các câu trả lời sinh ra ($\hat{y}$) sử dụng một tập hợp các chỉ số tương đồng so sánh câu trả lời được dự đoán ($\hat{y}$) với câu trả lời tham chiếu (chuẩn) ($y$).
+
+\subsubsection{Cosine Similarity}
+
+Đo lường độ tương đồng giữa các vector nhúng của câu trả lời sinh ra và câu trả lời chuẩn. Cho các vector nhúng $v_{\hat{y}}$ và $v_y$:
+\[
+  \text{CosineSim}(\hat{y}, y) = \frac{v_{\hat{y}} \cdot v_y}{\|v_{\hat{y}}\|\|v_y\|}
+\]
+
+\subsubsection{Token Overlap / Jaccard Similarity}
+
+Đo lường mức độ trùng khớp cấp độ từ giữa câu trả lời sinh ra và câu trả lời tham chiếu. Gọi $W_{\hat{y}}$ và $W_y$ là tập hợp các token trong $\hat{y}$ và $y$:
+
+\[
+  \text{Jaccard}(\hat{y}, y) = \frac{|W_{\hat{y}} \cap W_y|}{|W_{\hat{y}} \cup W_y|}
+  \qquad
+  \text{TokenOverlap}(\hat{y}, y) = \frac{|W_{\hat{y}} \cap W_y|}{|W_y|}
+\]
+
+\subsubsection{BLEU Score}
+
+Đo lường độ chính xác n-gram của câu trả lời sinh ra so với câu trả lời tham chiếu:
+\[
+  \text{BLEU}(\hat{y}, y) = \text{BP} \cdot \frac{|W_{\hat{y}} \cap W_y|}{|W_{\hat{y}}|}
+  \qquad
+  \text{BP} =
+  \begin{cases}
+    1, & \text{nếu } |\hat{y}| \geq |y| \\
+    \exp\!\left(1 - \dfrac{|y|}{|\hat{y}|}\right), & \text{nếu } |\hat{y}| < |y|
+  \end{cases}
+\]
+
+\subsubsection{ROUGE-L}
+
+Đo lường độ dài của chuỗi con chung dài nhất (LCS) giữa $\hat{y}$ và $y$:
+\[
+  P = \frac{\text{LCS}(\hat{y}, y)}{|\hat{y}|}
+  \qquad
+  R = \frac{\text{LCS}(\hat{y}, y)}{|y|}
+  \qquad
+  \text{ROUGE-L} = \frac{2 \cdot P \cdot R}{P + R}
+\]
