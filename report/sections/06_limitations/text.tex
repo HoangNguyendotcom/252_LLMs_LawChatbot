@@ -1,37 +1,87 @@
 \section{Hạn chế và hướng phát triển}
 
-Mặc dù hệ thống RAG đã được tối ưu hóa đáng kể, hệ thống vẫn còn tồn tại một số hạn chế và tiềm năng cải thiện trong tương lai.
+Mặc dù hệ thống RAG đã được tối ưu hóa đáng kể so với baseline, đặc biệt thông qua Hybrid
+Search và Rerank, và đã giải quyết được vấn đề giới hạn tài nguyên Colab, hệ thống vẫn còn
+tồn tại một số hạn chế và tiềm năng cải thiện trong tương lai.
 
 \subsection{Hạn chế}
 
 \begin{enumerate}
-  \item \textbf{Mô hình LLM kích thước nhỏ:} Việc sử dụng \texttt{Qwen3-1.7B} là giải pháp bắt buộc để hoạt động trên tài nguyên Colab. Mô hình nhỏ này có thể hạn chế khả năng suy luận phức tạp và tổng hợp thông tin từ nhiều đoạn ngữ cảnh dài.
+    \item \textbf{Mô hình LLM Kích thước nhỏ:} Việc sử dụng \texttt{Qwen3-1.7B} là giải pháp bắt buộc để hoạt
+    động trên tài nguyên Colab. Tuy nhiên, mô hình nhỏ này có thể hạn chế khả năng suy
+    luận phức tạp (complex reasoning) và tổng hợp thông tin từ nhiều đoạn ngữ cảnh dài, vốn
+    là yêu cầu thường gặp đối với dữ liệu pháp lý.
 
-  \item \textbf{Giới hạn của phương pháp đánh giá:} Các metrics tự động như Cosine Similarity, ROUGE-L và BLEU không thể đánh giá toàn diện tính chính xác của thông tin, đặc biệt trong lĩnh vực pháp lý.
+    \item \textbf{Giới hạn của Phương pháp Đánh giá:} Việc đánh giá chỉ dựa trên các metrics tự động như
+    Cosine Similarity, ROUGE-L, và BLEU-Score không thể đánh giá toàn diện tính chính
+    xác của thông tin và sự liên quan của câu trả lời, đặc biệt trong lĩnh vực pháp lý.
 
-  \item \textbf{Cấu hình RAG tĩnh (Offline RAG):} Chiến lược Context Pre-computation không phải là giải pháp thời gian thực. Hệ thống không thể xử lý truy vấn mới ngay lập tức nếu dữ liệu cơ sở thay đổi.
+    \item \textbf{Cấu hình RAG Tĩnh (Offline RAG):} Chiến lược Context Pre-computation giải quyết vấn
+    đề triển khai nhưng không phải là một giải pháp thời gian thực (Real-time RAG). Hệ
+    thống không thể xử lý truy vấn mới ngay lập tức mà cần phải chạy lại toàn bộ quy trình
+    truy xuất nếu dữ liệu cơ sở thay đổi.
 
-  \item \textbf{Độ nhạy của tham số Hybrid Search:} Hiệu suất phụ thuộc nhiều vào việc lựa chọn hệ số $\alpha$. Việc tinh chỉnh thủ công $\alpha$ có thể không đảm bảo tính tối ưu trên toàn bộ tập dữ liệu.
+    \item \textbf{Độ nhạy của Tham số Hybrid Search:} Hiệu suất của Hybrid Search phụ thuộc nhiều vào
+    việc lựa chọn hệ số $\alpha$. Việc tinh chỉnh thủ công $\alpha$ có thể không đảm bảo tính tối ưu trên
+    toàn bộ tập dữ liệu.
 \end{enumerate}
 
 \subsection{Hướng phát triển}
 
+Để khắc phục các hạn chế trên và tiếp tục nâng cao hiệu suất hệ thống, đặc biệt là độ chính
+xác truy xuất các thực thể pháp luật, đề xuất các hướng phát triển sau:
+
 \begin{enumerate}
-  \item \textbf{Tối ưu hóa truy vấn nâng cao:}
-  \begin{itemize}
-    \item \textbf{Query Rewriting:} Sử dụng LLM để viết lại câu hỏi ban đầu trước khi gửi đến Vector Store, giúp truy xuất tài liệu chính xác hơn.
+    \item \textbf{Tối ưu hóa truy vấn nâng cao:}
 
-    \textit{Ví dụ:} ``Tôi bị chậm lương thì làm thế nào?'' $\to$ ``Điều 94 Bộ luật Lao động 2019 quy định về trách nhiệm chi trả lương khi bị chậm.''
+    \begin{itemize}
+        \item \textbf{Query Rewriting (Viết lại truy vấn):} Kỹ thuật này sử dụng một Large Language
+        Model (LLM) để viết lại hoặc làm rõ câu hỏi ban đầu của người dùng trước khi gửi
+        đến Vector Store. Điều này đặc biệt cần thiết trong lĩnh vực pháp luật, nơi người
+        dùng thường đặt các câu hỏi tổng quát nhưng yêu cầu truy xuất tài liệu chính xác
+        (ví dụ: tên, số hiệu văn bản).
 
-    \item \textbf{Phân rã truy vấn:} LLM phân rã câu hỏi phức tạp thành nhiều câu hỏi con độc lập, giúp giải quyết các yêu cầu suy luận pháp lý đa bước.
-  \end{itemize}
+        \begin{itemize}
+            \item \textit{Ví dụ ứng dụng pháp luật:} Người dùng hỏi ``Tôi bị chậm lương thì làm thế nào?''
+            $\rightarrow$ Query Rewriting giúp tạo ra truy vấn truy xuất hiệu quả hơn như ``Điều 94
+            Bộ luật Lao động 2019 quy định về trách nhiệm chi trả lương khi bị chậm.''
+        \end{itemize}
 
-  \item \textbf{Tối ưu hóa cấu trúc ngữ cảnh -- RAPTOR:} Kiến trúc RAPTOR tạo ra các chunks ở nhiều cấp độ, sử dụng LLM để tóm tắt các đoạn nhỏ thành các đoạn trừu tượng hơn, phù hợp với tài liệu pháp lý có cấu trúc phân cấp.
+        \item \textbf{Phân rã truy vấn:} Áp dụng cho các câu hỏi phức tạp hoặc đa bước. LLM phân rã
+        câu hỏi gốc thành nhiều câu hỏi con, độc lập, và dễ dàng truy xuất thông tin cụ thể
+        theo từng bước logic, giúp giải quyết các yêu cầu suy luận pháp lý phức tạp.
 
-  \item \textbf{Nâng cấp mô hình:}
-  \begin{itemize}
-    \item \textbf{Embedding chuyên ngành:} Khám phá các mô hình như \texttt{BKAI/vietnamese-large-bge-m3} hoặc fine-tune \texttt{keepitreal/vietnamese-sbert} trên tập dữ liệu pháp luật được gán nhãn.
+        \begin{itemize}
+            \item \textit{Ví dụ ứng dụng pháp luật:} Người dùng hỏi ``Thủ tục khiếu nại quyết định hành
+            chính ban đầu là gì và nếu không đồng ý thì làm thế nào tiếp theo?'' $\rightarrow$ Phân
+            rã thành hai truy vấn con để truy xuất: (1) ``Thủ tục khiếu nại quyết định hành
+            chính lần đầu'' và (2) ``Thủ tục khởi kiện quyết định hành chính ra tòa án.''
+        \end{itemize}
+    \end{itemize}
 
-    \item \textbf{LLM lớn hơn:} Chuyển sang các mô hình lớn hơn như PhoGPT hoặc \texttt{Qwen 7B} (đã lượng tử hóa) để nâng cao khả năng suy luận phức tạp và xử lý ngữ cảnh dài.
-  \end{itemize}
+    \item \textbf{Tối ưu hóa cấu trúc ngữ cảnh (Context Structuring) -- RAPTOR:}
+
+    \begin{itemize}
+        \item \textbf{RAPTOR:} Đây là một kiến trúc RAG tiên tiến giải quyết vấn đề truy xuất từ các
+        tài liệu rất dài và có cấu trúc phân cấp (như các bộ luật). RAPTOR tạo ra các đoạn
+        văn bản (chunks) ở nhiều cấp độ, sử dụng LLM để tóm tắt các đoạn nhỏ thành các
+        đoạn văn bản trừu tượng hơn.
+    \end{itemize}
+
+    \item \textbf{Nâng cấp mô hình Embedding chuyên biệt và lớn hơn:}
+
+    \begin{itemize}
+        \item \textbf{Embedding chuyên ngành:} Khám phá các mô hình Embedding tiếng Việt mạnh hơn
+        như \texttt{BKAI/vietnamese-large-bge-m3} hoặc thực hiện \textit{fine-tune} mô hình
+        \texttt{keepitreal/vietnamese-sbert} trên một tập dữ liệu pháp luật được gán nhãn, đặc
+        biệt tập trung vào các thực thể (Entity) như tên luật, số hiệu văn bản, và điều khoản.
+        Điều này giúp mô hình tạo ra vector chính xác hơn cho các truy vấn chứa các từ khóa
+        đặc thù.
+
+        \item \textbf{LLM Lớn hơn:} Chuyển sang sử dụng các mô hình LLM lớn hơn (ví dụ: PhoGPT hoặc
+        các phiên bản Qwen 7B đã được lượng tử hóa -- Quantization) nếu môi trường triển
+        khai cho phép. Mô hình lớn hơn sẽ có khả năng suy luận phức tạp và xử lý ngữ cảnh
+        dài (tức là tổng hợp thông tin từ nhiều điều khoản khác nhau) tốt hơn so với mô
+        hình 1.7B.
+    \end{itemize}
 \end{enumerate}

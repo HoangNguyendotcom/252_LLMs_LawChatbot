@@ -1,51 +1,138 @@
 \section{Kết luận}
 
-Báo cáo này đã trình bày chi tiết quá trình xây dựng, tối ưu hóa và đánh giá một hệ thống RAG dành cho lĩnh vực pháp luật Việt Nam. Hệ thống được phát triển nhằm cung cấp câu trả lời chính xác, dựa trên ngữ cảnh từ kho văn bản luật lớn, đồng thời thiết lập một quy trình triển khai ổn định trên môi trường tài nguyên hạn chế.
+Báo cáo này đã trình bày một cách chi tiết quá trình xây dựng, tối ưu hóa và đánh giá một
+hệ thống Retrieval Augmented Generation (RAG) dành cho lĩnh vực pháp luật Việt Nam dựa
+trên một hình cơ sở và dữ liệu được cung cấp. Hệ thống được phát triển nhằm cung cấp câu trả
+lời chính xác, dựa trên ngữ cảnh từ kho văn bản luật lớn. Mục tiêu kép của dự án không chỉ là
+cải thiện chất lượng câu trả lời mà còn là thiết lập một quy trình triển khai ổn định trên môi
+trường tài nguyên hạn chế.
 
 \subsection{Kết quả tổng thể}
 
-\begin{table}[H]
+Bảng~7 tóm tắt sự cải thiện toàn diện của hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine
+Distance, Chunk Size 1024, Qwen3-1.7B) so với mô hình baseline ban đầu trên các chỉ số đánh
+giá.
+
+\begin{table}[h!]
 \centering
-\caption{So sánh chỉ số đánh giá: Baseline vs. Hệ thống tối ưu hóa}
-\begin{tabular}{lcc}
-  \toprule
-  \textbf{Chỉ số} & \textbf{Hệ thống ban đầu} & \textbf{Hệ thống tối ưu hóa} \\
-  \midrule
-  Cosine Similarity  & 0.6871 & \textbf{0.7026} \\
-  Jaccard Similarity & 0.2335 & \textbf{0.2447} \\
-  Token Overlap      & 0.6716 & \textbf{0.7173} \\
-  BLEU Score         & 0.1615 & \textbf{0.1691} \\
-  ROUGE-L            & 0.1215 & \textbf{0.1310} \\
-  \bottomrule
+\caption{So sánh chỉ số đánh giá: Baseline (Qwen1.5-1.8B + chunk size 2000 + L2 Distance) so
+với Hệ thống Tối ưu hóa (Qwen3-1.7B + chunk size 1024 + Hybrid Search + Rerank)}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Hệ thống ban đầu} & \textbf{Hệ thống Tối ưu hóa} \\
+\hline
+Cosine Similarity   & 0.6871 & \textbf{0.7026} \\
+Jaccard Similarity  & 0.2335 & \textbf{0.2447} \\
+Token Overlap       & 0.6716 & \textbf{0.7173} \\
+BLEU Score          & 0.1615 & \textbf{0.1691} \\
+ROUGE-L             & 0.1215 & \textbf{0.1310} \\
+\hline
 \end{tabular}
 \end{table}
 
-Hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine Distance, chunk size 1024, Qwen3-1.7B) cải thiện đồng bộ trên tất cả các chỉ số so với baseline (Qwen1.5-1.8B, chunk size 2000, L2 Distance), thể hiện sự nâng cao chất lượng câu trả lời một cách toàn diện.
+Bảng~7 cho thấy hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine Distance, chunk size
+1024, Qwen3-1.7B) cải thiện đồng bộ trên tất cả các chỉ số đánh giá so với hệ thống baseline
+ban đầu (Qwen1.5-1.8B, chunk size 2000, L2 Distance).
+
+Điều này cho thấy các thay đổi không chỉ mang tính cục bộ (chỉ cải thiện một khía cạnh nào
+đó) mà nâng cao chất lượng câu trả lời một cách \textbf{toàn diện}, từ mức độ tương đồng ngữ nghĩa,
+độ trùng khớp từ vựng cho đến cấu trúc và mạch lạc của văn bản sinh ra.
+
+\subsubsection*{Cosine Similarity ($0.6871 \rightarrow 0.7026$)}
+
+Cosine Similarity đo mức độ tương đồng ngữ nghĩa giữa embedding của câu trả lời sinh ra và
+câu trả lời chuẩn (ground truth). Giá trị càng cao, nội dung trả lời càng gần về ý nghĩa tổng
+thể. Việc tăng Cosine Similarity cho thấy:
 
 \begin{itemize}
-  \item \textbf{Cosine Similarity} ($0.6871 \to 0.7026$): Ngữ cảnh truy hồi phù hợp hơn nhờ Hybrid Search + Rerank; mô hình Qwen3-1.7B hiểu và diễn đạt đúng ý nghĩa câu hỏi tốt hơn.
-  \item \textbf{Jaccard Similarity} ($0.2335 \to 0.2447$): Câu trả lời chứa nhiều thuật ngữ và từ khóa quan trọng giống với câu trả lời chuẩn hơn.
-  \item \textbf{Token Overlap} ($0.6716 \to 0.7173$): Chỉ số tăng mạnh nhất -- hệ thống truy hồi được đoạn văn chứa thông tin đúng trọng tâm, giảm tình trạng hallucination.
-  \item \textbf{BLEU Score} ($0.1615 \to 0.1691$): Cấu trúc câu và cách diễn đạt gần hơn với câu trả lời chuẩn.
-  \item \textbf{ROUGE-L} ($0.1215 \to 0.1310$): Câu trả lời có bố cục logic và trình tự nội dung gần với câu trả lời chuẩn hơn.
+    \item Ngữ cảnh truy hồi (retrieved context) phù hợp hơn nhờ Hybrid Search + Rerank.
+    \item Mô hình Qwen3-1.7B hiểu và diễn đạt đúng ``ý'' của câu hỏi tốt hơn so với baseline.
 \end{itemize}
+
+$\Rightarrow$ Điều này khẳng định hệ thống tối ưu hóa \textbf{hiểu đúng vấn đề} chứ không chỉ khớp bề mặt từ ngữ.
+
+\subsubsection*{Jaccard Similarity ($0.2335 \rightarrow 0.2447$)}
+
+Jaccard Similarity đo tỉ lệ giao nhau của tập token giữa câu trả lời sinh ra và ground truth,
+phản ánh mức độ trùng khớp từ vựng ở mức tập hợp. Sự gia tăng cho thấy:
+
+\begin{itemize}
+    \item Câu trả lời chứa nhiều thuật ngữ và từ khóa quan trọng giống với câu trả lời chuẩn hơn.
+    \item Chunk size 1024 giúp chia nhỏ ngữ cảnh hợp lý, giảm nhiễu và tăng độ chính xác của
+    thông tin được đưa vào LLM.
+\end{itemize}
+
+$\Rightarrow$ Điều này thể hiện \textbf{tính chính xác về mặt thuật ngữ} được cải thiện.
+
+\subsubsection*{Token Overlap ($0.6716 \rightarrow 0.7173$)}
+
+Token Overlap đo tỉ lệ token trùng khớp trực tiếp giữa hai câu trả lời, phản ánh mức độ ``bám
+sát'' nội dung chuẩn. Đây là chỉ số tăng mạnh nhất, cho thấy:
+
+\begin{itemize}
+    \item Hệ thống tối ưu hóa truy hồi được đoạn văn chứa thông tin \textbf{đúng trọng tâm} hơn.
+    \item Reranking giúp ưu tiên các đoạn có giá trị cao, giảm tình trạng LLM ``hallucinate'' (ảo
+    giác).
+\end{itemize}
+
+$\Rightarrow$ Kết quả chứng minh câu trả lời \textbf{đúng và đủ thông tin} hơn so với baseline.
+
+\subsubsection*{BLEU Score ($0.1615 \rightarrow 0.1691$)}
+
+BLEU đo độ trùng khớp $n$-gram (thường là 1--4 gram) giữa câu trả lời sinh ra và ground truth,
+thường dùng trong đánh giá chất lượng sinh ngôn ngữ. Mặc dù mức tăng không lớn (đặc trưng
+của BLEU trong bài toán QA), sự cải thiện cho thấy:
+
+\begin{itemize}
+    \item Cấu trúc câu và cách diễn đạt của hệ thống tối ưu hóa gần hơn với câu trả lời chuẩn.
+    \item Mô hình sinh ngôn ngữ \textbf{mạch lạc hơn}, ít sai lệch về cú pháp.
+\end{itemize}
+
+$\Rightarrow$ Điều này phản ánh \textbf{chất lượng diễn đạt} được cải thiện.
+
+\subsubsection*{ROUGE-L ($0.1215 \rightarrow 0.1310$)}
+
+ROUGE-L đo Longest Common Subsequence, phản ánh mức độ tương đồng về cấu trúc và trình
+tự nội dung giữa hai văn bản. Nhận xét cải thiện: Sự gia tăng ROUGE-L cho thấy:
+
+\begin{itemize}
+    \item Câu trả lời của hệ thống tối ưu hóa có \textbf{bố cục logic} hơn.
+    \item Trình tự thông tin gần với câu trả lời chuẩn, không chỉ đúng ý mà còn đúng cách trình
+    bày.
+\end{itemize}
+
+$\Rightarrow$ Điều này chứng minh hệ thống tạo ra câu trả lời \textbf{mạch lạc và có cấu trúc tốt hơn}.
 
 \subsection{Tóm tắt kết quả đạt được}
 
+Các cải tiến chiến lược đã được áp dụng ở cả ba khía cạnh \textbf{Truy xuất}, \textbf{Sinh} và \textbf{Triển khai}, mang
+lại các thành tựu chính như sau:
+
 \begin{enumerate}
-  \item \textbf{Tối ưu hóa truy xuất:}
-  \begin{itemize}
-    \item Xác định chiến lược Chunking tối ưu (\texttt{chunk\_size=1024}) và Cosine Similarity để tăng độ chính xác truy xuất ngữ nghĩa.
-    \item Triển khai thành công \textbf{Hybrid Search (FAISS + BM25)} kết hợp \textbf{Rerank} (\texttt{BAAI/bge-reranker-large}).
-  \end{itemize}
+    \item \textbf{Tối ưu hóa truy xuất:}
+    \begin{itemize}
+        \item Hệ thống đã được tinh chỉnh các tham số cơ bản, xác định chiến lược \textbf{Chunking} tối
+        ưu (\texttt{chunk\_size=1024}) và sử dụng \textbf{Cosine Similarity} để tăng độ chính xác truy xuất
+        ngữ nghĩa.
 
-  \item \textbf{Cải thiện chất lượng sinh:}
-  \begin{itemize}
-    \item Giải quyết vấn đề sinh văn bản tiếng Việt kém chất lượng bằng cách chuyển sang \texttt{Qwen3-1.7B}.
-  \end{itemize}
+        \item Triển khai thành công kỹ thuật \textbf{Hybrid Search (FAISS + BM25)} kết hợp với Rerank
+        (\texttt{BAAI/bge-reranker-large}) đã nâng cao đáng kể độ chính xác của ngữ cảnh. Kết
+        quả định lượng cho thấy sự cải thiện ở chỉ số \textbf{Cosine Similarity} (từ 0.6993 lên 0.7026)
+        và các metrics liên quan đến độ trùng lặp từ vựng, chứng minh ngữ cảnh được truy
+        xuất có tính tương đồng cao hơn với câu trả lời chuẩn.
+    \end{itemize}
 
-  \item \textbf{Giải pháp triển khai thực tế:}
-  \begin{itemize}
-    \item Hiện thực chiến lược \textbf{Context Pre-computation} (tách biệt Retrieval và Generation) khắc phục triệt để vấn đề giới hạn tài nguyên Google Colab.
-  \end{itemize}
+    \item \textbf{Cải thiện chất lượng sinh:}
+    \begin{itemize}
+        \item Giải quyết vấn đề sinh văn bản tiếng Việt kém chất lượng của mô hình baseline bằng
+        cách chuyển sang sử dụng \texttt{Qwen3-1.7B}.
+    \end{itemize}
+
+    \item \textbf{Giải pháp triển khai thực tế:}
+    \begin{itemize}
+        \item Hiện thực chiến lược \textbf{Context Pre-computation} (Tách biệt Retrieval và Generation)
+        đã giúp khắc phục triệt để vấn đề giới hạn tài nguyên Google Colab. Điều này không
+        chỉ đảm bảo tính ổn định mà còn cho phép hệ thống có thể tái tạo và dễ dàng đánh
+        giá hiệu quả của từng chiến lược truy xuất khác nhau.
+    \end{itemize}
 \end{enumerate}

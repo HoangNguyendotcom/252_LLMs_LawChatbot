@@ -24,8 +24,11 @@ Tập dữ liệu văn bản bao gồm tổng cộng \textbf{16,440 file .txt}. 
 Tập dữ liệu RES gồm \textbf{2,745 cặp câu hỏi--đáp}. Trong thí nghiệm này, sử dụng một \textbf{tập con gồm 100 cặp Q\&A} đầu tiên để đánh giá:
 
 \begin{itemize}
-  \item \textbf{Độ dài câu hỏi trung bình:} 31.9 từ.
-  \item \textbf{Độ dài câu trả lời trung bình:} 360.6 từ.
+  \item \textbf{Độ dài câu hỏi trung bình:} 31.9 từ. Các câu hỏi thường ngắn gọn, súc tích nhưng yêu cầu
+độ chính xác cao về mặt thông tin, đòi hỏi hệ thống phải tìm đúng "keyword" chuyên
+ngành thay vì chỉ so khớp từ vựng thông thường.
+  \item \textbf{Độ dài câu trả lời trung bình:} 360.6 từ. Độ dài này phản ánh mức độ chi tiết và thông tin
+phong phú cần được hệ thống RAG tổng hợp và xử lý để đưa ra câu trả lời thỏa đáng.
 \end{itemize}
 
 \begin{table}[H]
@@ -55,6 +58,8 @@ Tổng thể, dữ liệu không chỉ có sự đa dạng về độ dài mà c
   \item \textbf{Tính chất chuyên ngành cao:} Văn bản pháp luật sử dụng hệ thống thuật ngữ chuyên biệt, cấu trúc câu phức tạp. Điều này đòi hỏi mô hình Embedding phải có khả năng nắm bắt ngữ nghĩa sâu.
   \item \textbf{Yêu cầu về độ chính xác:} Câu trả lời trong lĩnh vực pháp lý đòi hỏi tính chính xác tuyệt đối dựa trên điều luật. Việc ảo giác (hallucination) là không thể chấp nhận.
 \end{itemize}
+Việc phân tích kỹ lưỡng đặc điểm này giúp định hướng việc lựa chọn mô hình Vietnamese-
+sbert (tối ưu cho tiếng Việt), chiến lược Hybrid Search (kết hợp từ khóa và ngữ nghĩa) và thiết kế Prompt phù hợp trong các bước tiếp theo.
 
 \subsection{Chỉ số đánh giá}
 
@@ -66,6 +71,9 @@ Sử dụng cosine similarity \cite{manning2008introduction} để đo lường 
 \[
   \text{CosineSim}(\hat{y}, y) = \frac{v_{\hat{y}} \cdot v_y}{\|v_{\hat{y}}\|\|v_y\|}
 \]
+\textbf{Ý nghĩa:} Chỉ số này phản ánh mức độ tương đồng ngữ nghĩa tổng thể giữa hai văn bản. Giá trị
+cao cho thấy nội dung trả lời gần về mặt ý nghĩa.
+
 
 \subsubsection{Token Overlap / Jaccard Similarity}
 
@@ -76,7 +84,8 @@ Sử dụng cosine similarity \cite{manning2008introduction} để đo lường 
   \qquad
   \text{TokenOverlap}(\hat{y}, y) = \frac{|W_{\hat{y}} \cap W_y|}{|W_y|}
 \]
-
+\textbf{Ý nghĩa:} Cả hai chỉ số đều phản ánh mức độ chia sẻ từ vựng trực tiếp. Token Overlap đặc biệt
+hữu ích để đánh giá mức độ bao phủ các từ khóa quan trọng của câu trả lời chuẩn.
 \subsubsection{BLEU Score}
 
 Đại lượng BLEU Score\cite{papineni2002bleu} đuợc sử dụng để đo lường độ chính xác n-gram của câu trả lời sinh ra so với câu trả lời tham chiếu:
@@ -89,7 +98,8 @@ Sử dụng cosine similarity \cite{manning2008introduction} để đo lường 
     \exp\!\left(1 - \dfrac{|y|}{|\hat{y}|}\right), & \text{nếu } |\hat{y}| < |y|
   \end{cases}
 \]
-
+\textbf{Ý nghĩa:} BLEU đánh giá độ chính xác của các cụm từ (n-gram) trong câu trả lời sinh ra. Hệ số
+phạt ngắn gọn (BP) đảm bảo rằng câu trả lời quá ngắn không bị đánh giá cao một cách giả tạo.
 \subsubsection{ROUGE-L}
 
 ROUGE-L \cite{lin2004rouge} đo lường độ dài của chuỗi con chung dài nhất (LCS) giữa $\hat{y}$ và $y$:
@@ -100,3 +110,6 @@ ROUGE-L \cite{lin2004rouge} đo lường độ dài của chuỗi con chung dài
   \qquad
   \text{ROUGE-L} = \frac{2 \cdot P \cdot R}{P + R}
 \]
+\textbf{Ý nghĩa:} ROUGE-L tập trung vào việc đánh giá sự tương đồng về cấu trúc và trình tự thông
+tin. Giá trị cao cho thấy câu trả lời sinh ra có bố cục logic và trình tự nội dung gần với câu trả
+lời chuẩn.
