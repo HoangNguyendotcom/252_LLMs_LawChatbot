@@ -62,7 +62,7 @@ Việc đánh giá chất lượng của các câu trả lời sinh ra ($\hat{y}
 
 \subsubsection{Cosine Similarity}
 
-Đo lường độ tương đồng giữa các vector nhúng của câu trả lời sinh ra và câu trả lời chuẩn. Cho các vector nhúng $v_{\hat{y}}$ và $v_y$:
+Sử dụng cosine similarity \cite{manning2008introduction} để đo lường độ tương đồng giữa các vector nhúng của câu trả lời sinh ra và câu trả lời chuẩn. Cho các vector nhúng $v_{\hat{y}}$ và $v_y$:
 \[
   \text{CosineSim}(\hat{y}, y) = \frac{v_{\hat{y}} \cdot v_y}{\|v_{\hat{y}}\|\|v_y\|}
 \]
@@ -79,7 +79,7 @@ Việc đánh giá chất lượng của các câu trả lời sinh ra ($\hat{y}
 
 \subsubsection{BLEU Score}
 
-Đo lường độ chính xác n-gram của câu trả lời sinh ra so với câu trả lời tham chiếu:
+Đại lượng BLEU Score\cite{papineni2002bleu} đuợc sử dụng để đo lường độ chính xác n-gram của câu trả lời sinh ra so với câu trả lời tham chiếu:
 \[
   \text{BLEU}(\hat{y}, y) = \text{BP} \cdot \frac{|W_{\hat{y}} \cap W_y|}{|W_{\hat{y}}|}
   \qquad
@@ -92,7 +92,7 @@ Việc đánh giá chất lượng của các câu trả lời sinh ra ($\hat{y}
 
 \subsubsection{ROUGE-L}
 
-Đo lường độ dài của chuỗi con chung dài nhất (LCS) giữa $\hat{y}$ và $y$:
+ROUGE-L \cite{lin2004rouge} đo lường độ dài của chuỗi con chung dài nhất (LCS) giữa $\hat{y}$ và $y$:
 \[
   P = \frac{\text{LCS}(\hat{y}, y)}{|\hat{y}|}
   \qquad

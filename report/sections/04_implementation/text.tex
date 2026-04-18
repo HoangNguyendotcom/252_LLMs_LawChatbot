@@ -4,7 +4,7 @@ Quá trình hiện thực hệ thống RAG được tiến hành trên môi trư
 
 \subsection{Xây dựng Vector Database và cấu hình Embedding}
 
-Giai đoạn đầu tiên là chuyển đổi dữ liệu văn bản pháp luật thành các vector đặc trưng sử dụng LangChain và FAISS:
+Giai đoạn đầu tiên là chuyển đổi dữ liệu văn bản pháp luật thành các vector đặc trưng sử dụng LangChain và FAISS\cite{johnson2017faiss}:
 
 \begin{itemize}
   \item \textbf{Xử lý dữ liệu:} Chunking với \texttt{chunk\_size=1024}.
@@ -36,7 +36,7 @@ Thay vì truy xuất trực tiếp trong lúc sinh câu trả lời (Online Retr
 
 \subsubsection{Cơ chế Hybrid Search kết hợp Rerank}
 
-Xây dựng lớp \texttt{HybridFAISSBM25Searcher} kết hợp Dense Retrieval (FAISS) và Lexical Retrieval (BM25), sau đó rerank bằng \texttt{BAAI/bge-reranker-large}:
+Xây dựng lớp \texttt{HybridFAISSBM25Searcher} \cite{robertson1994bm25}, \cite{johnson2017faiss} kết hợp Dense Retrieval (FAISS) và Lexical Retrieval (BM25), sau đó rerank bằng \texttt{BAAI/bge-reranker-large}\cite{bge_reranker}:
 
 \begin{lstlisting}[language=Python, caption={Lớp HybridFAISSBM25Searcher}]
 class HybridFAISSBM25Searcher:
