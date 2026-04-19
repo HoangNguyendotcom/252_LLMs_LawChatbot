@@ -9,7 +9,7 @@ trường tài nguyên hạn chế.
 
 \subsection{Kết quả tổng thể}
 
-Bảng~7 tóm tắt sự cải thiện toàn diện của hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine
+Bảng tóm tắt sự cải thiện toàn diện của hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine
 Distance, Chunk Size 1024, Qwen3-1.7B) so với mô hình baseline ban đầu trên các chỉ số đánh
 giá.
 
@@ -30,12 +30,12 @@ ROUGE-L             & 0.1215 & \textbf{0.1310} \\
 \end{tabular}
 \end{table}
 
-Bảng~7 cho thấy hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine Distance, chunk size
+Bảng cho thấy hệ thống tối ưu hóa (Hybrid Search + Rerank, Cosine Distance, chunk size
 1024, Qwen3-1.7B) cải thiện đồng bộ trên tất cả các chỉ số đánh giá so với hệ thống baseline
 ban đầu (Qwen1.5-1.8B, chunk size 2000, L2 Distance).
 
 Điều này cho thấy các thay đổi không chỉ mang tính cục bộ (chỉ cải thiện một khía cạnh nào
-đó) mà nâng cao chất lượng câu trả lời một cách \textbf{toàn diện}, từ mức độ tương đồng ngữ nghĩa,
+đó) mà nâng cao chất lượng câu trả lời một cách toàn diện, từ mức độ tương đồng ngữ nghĩa,
 độ trùng khớp từ vựng cho đến cấu trúc và mạch lạc của văn bản sinh ra.
 
 \subsubsection*{Cosine Similarity ($0.6871 \rightarrow 0.7026$)}
@@ -49,7 +49,7 @@ thể. Việc tăng Cosine Similarity cho thấy:
     \item Mô hình Qwen3-1.7B hiểu và diễn đạt đúng ``ý'' của câu hỏi tốt hơn so với baseline.
 \end{itemize}
 
-$\Rightarrow$ Điều này khẳng định hệ thống tối ưu hóa \textbf{hiểu đúng vấn đề} chứ không chỉ khớp bề mặt từ ngữ.
+$\Rightarrow$ Điều này khẳng định hệ thống tối ưu hóa hiểu đúng vấn đề chứ không chỉ khớp bề mặt từ ngữ.
 
 \subsubsection*{Jaccard Similarity ($0.2335 \rightarrow 0.2447$)}
 
@@ -62,7 +62,7 @@ phản ánh mức độ trùng khớp từ vựng ở mức tập hợp. Sự gi
     thông tin được đưa vào LLM.
 \end{itemize}
 
-$\Rightarrow$ Điều này thể hiện \textbf{tính chính xác về mặt thuật ngữ} được cải thiện.
+$\Rightarrow$ Điều này thể hiện tính chính xác về mặt thuật ngữ được cải thiện.
 
 \subsubsection*{Token Overlap ($0.6716 \rightarrow 0.7173$)}
 
@@ -70,12 +70,12 @@ Token Overlap đo tỉ lệ token trùng khớp trực tiếp giữa hai câu tr
 sát'' nội dung chuẩn. Đây là chỉ số tăng mạnh nhất, cho thấy:
 
 \begin{itemize}
-    \item Hệ thống tối ưu hóa truy hồi được đoạn văn chứa thông tin \textbf{đúng trọng tâm} hơn.
+    \item Hệ thống tối ưu hóa truy hồi được đoạn văn chứa thông tin đúng trọng tâm hơn.
     \item Reranking giúp ưu tiên các đoạn có giá trị cao, giảm tình trạng LLM ``hallucinate'' (ảo
     giác).
 \end{itemize}
 
-$\Rightarrow$ Kết quả chứng minh câu trả lời \textbf{đúng và đủ thông tin} hơn so với baseline.
+$\Rightarrow$ Kết quả chứng minh câu trả lời đúng và đủ thông tin hơn so với baseline.
 
 \subsubsection*{BLEU Score ($0.1615 \rightarrow 0.1691$)}
 
@@ -85,10 +85,10 @@ của BLEU trong bài toán QA), sự cải thiện cho thấy:
 
 \begin{itemize}
     \item Cấu trúc câu và cách diễn đạt của hệ thống tối ưu hóa gần hơn với câu trả lời chuẩn.
-    \item Mô hình sinh ngôn ngữ \textbf{mạch lạc hơn}, ít sai lệch về cú pháp.
+    \item Mô hình sinh ngôn ngữ mạch lạc hơn, ít sai lệch về cú pháp.
 \end{itemize}
 
-$\Rightarrow$ Điều này phản ánh \textbf{chất lượng diễn đạt} được cải thiện.
+$\Rightarrow$ Điều này phản ánh chất lượng diễn đạt được cải thiện.
 
 \subsubsection*{ROUGE-L ($0.1215 \rightarrow 0.1310$)}
 
@@ -96,12 +96,12 @@ ROUGE-L đo Longest Common Subsequence, phản ánh mức độ tương đồng 
 tự nội dung giữa hai văn bản. Nhận xét cải thiện: Sự gia tăng ROUGE-L cho thấy:
 
 \begin{itemize}
-    \item Câu trả lời của hệ thống tối ưu hóa có \textbf{bố cục logic} hơn.
+    \item Câu trả lời của hệ thống tối ưu hóa có bố cục logic hơn.
     \item Trình tự thông tin gần với câu trả lời chuẩn, không chỉ đúng ý mà còn đúng cách trình
     bày.
 \end{itemize}
 
-$\Rightarrow$ Điều này chứng minh hệ thống tạo ra câu trả lời \textbf{mạch lạc và có cấu trúc tốt hơn}.
+$\Rightarrow$ Điều này chứng minh hệ thống tạo ra câu trả lời mạch lạc và có cấu trúc tốt hơn.
 
 \subsection{Tóm tắt kết quả đạt được}
 

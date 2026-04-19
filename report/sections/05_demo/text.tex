@@ -1,0 +1,101 @@
+\section{Demo}
+
+Phần này minh họa kết quả của ba phương pháp retrieval trên 5 câu hỏi mẫu được chọn từ tập RES dataset. Kết quả cho thấy sự cải thiện rõ rệt của Hybrid Search và Hybrid Search + Rerank so với Baseline.
+
+%----------------------------------------------------------
+% CÂU HỎI 1
+%----------------------------------------------------------
+\subsection*{Câu hỏi 1}
+
+\textbf{Câu hỏi:} Soft OTP là hình thức xác thực thế nào, gồm những loại nào và phần mềm Soft OTP cần tuân thủ những yêu cầu cụ thể gì theo quy định?
+
+\textbf{Câu trả lời chuẩn (Ground Truth):} Căn cứ tại điểm d khoản 3 Điều 11 Thông tư 50/2024/TT-NHNN quy định về Soft OTP là hình thức xác nhận thông qua mã OTP được tạo bởi phần mềm cài đặt trên thiết bị di động của khách hàng, phần mềm Soft OTP có thể là phần mềm độc lập hoặc được tích hợp với phần mềm ứng dụng Mobile Banking. Soft OTP có 02 loại: (1) Soft OTP loại cơ bản: mã OTP được sinh ngẫu nhiên theo thời gian, đồng bộ với hệ thống Online Banking; (2) Soft OTP loại nâng cao: mã OTP được tạo kết hợp với mã của từng giao dịch, khi thực hiện giao dịch, hệ thống Online Banking tạo ra một mã giao dịch thông báo cho khách hàng hoặc truyền cho phần mềm Soft OTP, khách hàng hoặc phần mềm Soft OTP tự động nhập mã giao dịch vào phần mềm Soft OTP để phần mềm Soft OTP tạo ra mã OTP. Phần mềm Soft OTP phải đáp ứng các yêu cầu: phải được đăng ký tại kho ứng dụng chính thức; phải yêu cầu kích hoạt trước khi sử dụng; phải có chức năng kiểm soát truy cập và tự động khóa khi nhập sai quá số lần quy định (không quá 10 lần); mã OTP có hiệu lực tối đa 02 phút.
+
+\textbf{Baseline:} \textit{(Trả lời bằng tiếng Trung, lẫn lộn khái niệm)} ``[ký tự tiếng Trung] OTP là một hình thức OTP, bao gồm Soft OTP và Hard OTP. Soft OTP là một hình thức sử dụng mã hóa khóa công khai, sử dụng khóa công khai để mã hóa một số và sử dụng khóa riêng tư để giải mã số đó. Soft OTP thường yêu cầu sử dụng ứng dụng khách để nhận OTP và sử dụng ứng dụng khách để tạo, lưu trữ và quản lý OTP. Hard OTP sử dụng phần cứng để triển khai OTP, ví dụ như lõi OTP, dải từ OTP, v.v. Hard OTP cần tuân theo một số giao thức và tiêu chuẩn cụ thể, ví dụ như ISO/IEC 14443 và EAN-13.''
+
+\textbf{Hybrid Search:} ``Soft OTP là một loại xác thực hai yếu tố (2FA), được sử dụng trong hệ thống bảo mật. Các loại Soft OTP bao gồm: mã OTP, mã OTP sinh học, mã OTP dạng số, mã OTP dạng chữ ký số. Các phần mềm Soft OTP cần tuân thủ các yêu cầu như: bảo mật, hiệu quả, độ tin cậy, khả năng mở rộng và tuân thủ các tiêu chuẩn an toàn thông tin. Các loại Soft OTP phổ biến bao gồm: (1) Mã OTP (One-Time Password): là mã số ngẫu nhiên được phát sinh và sử dụng chỉ trong thời gian ngắn, thường được gửi qua email, SMS hoặc qua ứng dụng di động; (2) Mã OTP sinh học: sử dụng dấu vân tay, khuôn mặt để xác thực; (3) Mã OTP dạng số: là mã số dạng số được gửi qua mạng; (4) Mã OTP dạng chữ ký số: là mã số được tạo ra từ chữ ký số của người dùng.''
+
+\textbf{Hybrid Search + Rerank:} ``Soft OTP (Secure One-Time Password) là một loại xác thực hai yếu tố, trong đó một yếu tố là mật khẩu một lần dùng (OTP) và yếu tố thứ hai là yếu tố không thể thiếu. Soft OTP là một hình thức xác thực được sử dụng trong hệ thống bảo mật, trong đó người dùng phải nhập mật khẩu một lần dùng (OTP) vào hệ thống để xác thực. Soft OTP có thể được sử dụng trong nhiều hình thức khác nhau, bao gồm: xác thực qua điện thoại, xác thực qua email, xác thực qua mạng, xác thực qua ứng dụng di động. Soft OTP cần tuân thủ các yêu cầu cụ thể theo quy định như: sử dụng mật khẩu một lần dùng, đảm bảo tính bảo mật của mật khẩu, và xác thực bằng các phương tiện khác như mật khẩu, mã số.''
+
+\textbf{Nhận xét:} Baseline hoàn toàn thất bại, trả lời bằng tiếng Trung và không liên quan đến câu hỏi. Hybrid Search và Hybrid Search + Rerank đưa ra câu trả lời bằng tiếng Việt và đúng lĩnh vực, tuy nhiên chưa trích dẫn đúng điều khoản cụ thể trong Thông tư 50/2024/TT-NHNN và phân loại Soft OTP chưa chính xác so với ground truth do giới hạn của LLM nhỏ.
+
+%----------------------------------------------------------
+% CÂU HỎI 2
+%----------------------------------------------------------
+\subsection*{Câu hỏi 2}
+
+\textbf{Câu hỏi:} Khái niệm ``hệ quản trị cơ sở dữ liệu'' được Thông tư 50/2024/TT-NHNN định nghĩa như thế nào?
+
+\textbf{Câu trả lời chuẩn (Ground Truth):} Căn cứ tại khoản 10 Điều 2 Thông tư 50/2024/TT-NHNN, hệ quản trị cơ sở dữ liệu là phần mềm được thiết kế để quản lý, lưu trữ, truy xuất và thực thi các truy vấn dữ liệu trong cơ sở dữ liệu.
+
+\textbf{Baseline:} \textit{(Hallucination, không dựa vào ngữ cảnh)} ``Hệ quản trị cơ sở dữ liệu (HCD) là một hệ thống quản lý các dữ liệu được thực hiện theo quy định của 50/2024/TT-NHNN. Ở các chức năng và chức năng của hệ quản trị cơ sở dữ liệu (HCD), chúng được chỉ định theo quy định của 50/2024/TT-NHNN. Điều này có nghĩa là các chức năng và chức năng của hệ quản trị cơ sở dữ liệu (HCD) được yêu cầu và chỉ định theo quy định của 50/2024/TT-NHNN, không thể được tự định khi cần.''
+
+\textbf{Hybrid Search:} ``Hệ quản trị cơ sở dữ liệu là hệ thống các công cụ, phần mềm, quy trình và quy tắc để quản lý, lưu trữ, cập nhật, bảo vệ và khai thác dữ liệu trong cơ sở dữ liệu. Thông tư 50/2024/TT-NHNN định nghĩa hệ quản trị cơ sở dữ liệu như một hệ thống tổ chức, quản lý, bảo mật và truy cập dữ liệu trong cơ sở dữ liệu quốc gia, đảm bảo tính nhất quán, hiệu quả và an toàn của dữ liệu. Nhiệm vụ chính của hệ quản trị cơ sở dữ liệu là quản lý, bảo mật, truy cập, cập nhật và khai thác dữ liệu trong cơ sở dữ liệu quốc gia, đảm bảo tính nhất quán, hiệu quả và an toàn của dữ liệu.''
+
+\textbf{Hybrid Search + Rerank:} \textit{(Lỗi ngữ cảnh không liên quan)} ``Dữ liệu đang cập nhật tình trạng: hết hiệu lực. Trong ngữ cảnh cung cấp thông tin, hãy trả lời câu hỏi theo cách của bạn, không sử dụng markdown, không sử dụng câu hỏi, không sử dụng từ ngữ khác ngoài các từ khóa cho trong đoạn văn bản...''
+
+\textbf{Nhận xét:} Hybrid Search cho kết quả gần nhất về mặt ngữ nghĩa, nắm được các ý chính về quản lý và lưu trữ dữ liệu, tuy nhiên vẫn chưa trích dẫn đúng định nghĩa gốc trong thông tư. Hybrid Search + Rerank lấy nhầm ngữ cảnh chứa các chỉ dẫn prompt không liên quan, cho thấy Reranker không phải lúc nào cũng hiệu quả khi ngữ cảnh trong vector store bị nhiễu.
+
+%----------------------------------------------------------
+% CÂU HỎI 3
+%----------------------------------------------------------
+\subsection*{Câu hỏi 3}
+
+\textbf{Câu hỏi:} Trong thỏa thuận cung cấp dịch vụ Internet/Online Banking, ngân hàng phải nêu tối thiểu những nội dung, điều khoản nào theo quy định?
+
+\textbf{Câu trả lời chuẩn (Ground Truth):} Theo khoản 2 Điều 17 Thông tư 50/2024/TT-NHNN, đơn vị phải thông tin cho khách hàng về các điều khoản trong thỏa thuận cung cấp, sử dụng dịch vụ Online Banking, tối thiểu gồm: (1) Quyền lợi và nghĩa vụ của khách hàng sử dụng dịch vụ Online Banking; (2) Các loại dữ liệu của khách hàng mà đơn vị thu thập, mục đích sử dụng dữ liệu và trách nhiệm của đơn vị trong bảo mật dữ liệu của khách hàng; (3) Cam kết khả năng bảo đảm hoạt động liên tục của hệ thống Online Banking, tối thiểu gồm thời gian gián đoạn cung cấp dịch vụ trong một lần, tổng thời gian gián đoạn trong một năm trừ các trường hợp bất khả kháng; (4) Các nội dung khác của đơn vị đối với dịch vụ Online Banking nếu có.
+
+\textbf{Baseline:} \textit{(Lạc đề hoàn toàn, sinh ra nội dung không liên quan)} ``Nếu ngân hàng chỉ nêu những điều khoản thực hiện trong đơn vị đó thì không có nghĩa là có quyền của họ trong các điều khoản của các ngoài đơn vị. Khi làm cho các bên cung cấp dịch vụ Internet/Online Banking, thì phải có quyền của họ trong các điều khoản của các bên.''
+
+\textbf{Hybrid Search:} \textit{(Nhầm ngữ cảnh -- trả lời về hợp đồng thuyền viên)} ``Trong thỏa thuận cung cấp dịch vụ Internet/Online Banking, ngân hàng phải nêu tối thiểu những nội dung, điều khoản sau theo quy định: Tên đầy đủ, ngày sinh hoặc tuổi, và nơi sinh của thuyền viên; Tên và địa chỉ chủ tàu; Địa điểm và ngày thỏa thuận tuyển dụng của thuyền viên có hiệu lực.''
+
+\textbf{Hybrid Search + Rerank:} ``Theo ngữ cảnh cung cấp thông tin, trong hợp đồng vay vốn và các điều khoản liên quan, ngân hàng phải nêu các điều khoản như: Điều khoản về quyền và nghĩa vụ của bên vay (điều 2, 3, 4, 5, 6, 7, 8) trong đó xác định trách nhiệm của bên vay về việc cung cấp thông tin, sử dụng vốn đúng mục đích, báo cáo tài chính, và chịu trách nhiệm trước pháp luật; Điều khoản về kiểm tra, giám sát của ngân hàng (điều 4, 5) đảm bảo việc theo dõi và quản lý sử dụng vốn vay; Điều khoản về cam kết chung (điều 8) và các điều kiện liên quan đến tài khoản tiền gửi (điều 12); Điều khoản về giải ngân (điều 13) và thủ tục chấp thuận danh sách dự kiến nhân sự (điều 9).''
+
+\textbf{Nhận xét:} Câu hỏi này minh họa rõ ưu điểm của Reranking. Hybrid Search bị nhầm ngữ cảnh hoàn toàn sang lĩnh vực hàng hải. Hybrid Search + Rerank tuy vẫn chưa trích dẫn đúng điều khoản trong thông tư nhưng đã lọc được ngữ cảnh đúng lĩnh vực ngân hàng, cho câu trả lời có liên quan hơn đáng kể.
+
+%----------------------------------------------------------
+% CÂU HỎI 4
+%----------------------------------------------------------
+\subsection*{Câu hỏi 4}
+
+\textbf{Câu hỏi:} Khái niệm ``phương thức xử lý xuyên suốt'' (Straight-Through Processing) theo Thông tư 50/2024/TT-NHNN được hiểu như thế nào?
+
+\textbf{Câu trả lời chuẩn (Ground Truth):} Theo khoản 7 Điều 2 Thông tư 50/2024/TT-NHNN, phương thức xử lý xuyên suốt (Straight-Through Processing) là phương thức trao đổi thông tin, dữ liệu, tài liệu hai chiều tự động, thông qua kết nối an toàn giữa hệ thống thông tin của khách hàng với hệ thống Online Banking.
+
+\textbf{Baseline:} \textit{(Lỗi nghiêm trọng -- sinh ký tự lạ, lẫn tiếng Hàn và tiếng Trung)} ``Bước 1: Các quy tắc của chương trình trading có thể được thay thế theo phương thức xử lý [ký tự lỗi tiếng Trung + tiếng Hàn]. Bước 2: Các quy tắc của chương trình trading có thể được thay thế theo phương thức xử lý [ký tự lỗi tiếng Trung + tiếng Hàn]. Bước 3: Các quy tắc của chương trình trading có thể được thay thế theo phương thức xử lý [ký tự lỗi tiếng Trung + tiếng Hàn]...'' \textit{(lặp lại liên tục đến Bước 8)}
+
+\textbf{Hybrid Search:} ``Phương thức xử lý xuyên suốt (Straight-Through Processing) là một quy trình xử lý văn bản hành chính trong đó các thao tác được thực hiện liên tục và không cần sự can thiệp của nhân viên. Điều này giúp tối ưu hóa hiệu quả của quá trình xử lý, giảm thiểu rủi ro và thời gian xử lý. Trong ngữ cảnh của Thông tư 50/2024/TT-NHNN, phương thức xử lý xuyên suốt có thể được hiểu là một quy trình xử lý văn bản hành chính mà không cần sự can thiệp của nhân viên, đảm bảo tính liên tục và hiệu quả trong việc tiếp nhận, chuyển giao, xử lý và hệ thống hóa văn bản hành chính.''
+
+\textbf{Hybrid Search + Rerank:} ``Phương thức xử lý xuyên suốt (Straight-Through Processing) theo Thông tư 50/2024/TT-NHNN được hiểu là phương thức xử lý văn bản hành chính trong đó thông tin được chuyển tiếp tự động từ một hệ thống đến hệ thống khác mà không cần sự can thiệp của nhân viên hành chính. Tuy nhiên, trong thực tiễn, phương thức này có thể bị hạn chế do các yếu tố như: sự thiếu đồng bộ giữa các hệ thống, thiếu kỹ năng xử lý văn bản của nhân viên, hoặc các rào cản kỹ thuật.''
+
+\textbf{Nhận xét:} Baseline thất bại hoàn toàn với lỗi sinh ký tự lạ lặp lại. Cả Hybrid Search và Hybrid Search + Rerank đều nắm được ý chính về ``tự động, không cần can thiệp'', tuy nhiên cả hai đều hiểu lệch sang lĩnh vực văn bản hành chính thay vì đúng ngữ cảnh Online Banking theo thông tư.
+
+%----------------------------------------------------------
+% CÂU HỎI 5
+%----------------------------------------------------------
+\subsection*{Câu hỏi 5}
+
+\textbf{Câu hỏi:} Từ ngày 1/1/2025, theo quy định của Ngân hàng Nhà nước, phần mềm Online Banking phải có những chức năng bảo mật tối thiểu nào?
+
+\textbf{Câu trả lời chuẩn (Ground Truth):} Theo khoản 6 Điều 7 Thông tư 50/2024/TT-NHNN, phần mềm Online Banking phải có 8 chức năng bảo mật tối thiểu: (1) Mã hóa điểm đầu đến điểm cuối toàn bộ dữ liệu khi truyền trên môi trường mạng; (2) Bảo đảm tính toàn vẹn của dữ liệu giao dịch, phát hiện và ngăn chặn mọi sửa đổi trái phép; (3) Kiểm soát phiên giao dịch, tự động ngắt phiên khi không thao tác; (4) Che giấu mã PIN và mã khóa bí mật khi hiển thị; (5) Chống đăng nhập tự động; (6) Kiểm soát mã PIN và mã khóa bí mật bao gồm yêu cầu thay đổi mã mặc định, thông báo hết hạn, hủy hiệu lực khi nhập sai quá số lần quy định; (7) Phân tách hai bước tạo lập và phê duyệt giao dịch đối với khách hàng tổ chức; (8) Thông báo đăng nhập lần đầu hoặc đăng nhập trên thiết bị mới qua SMS hoặc kênh khác do khách hàng đăng ký.
+
+\textbf{Baseline:} \textit{(Hallucination -- liệt kê chung chung, không dựa vào luật)} ``(1) Không thể thiếu bảo mật và sự kiểm soát; (2) Các chức năng được cần thiết để bảo vệ mật khẩu, và các công cụ và thông tin không được thay thế hoặc xóa bỏ; (3) Các chức năng để kiểm soát tài khoản và các quyền của các người sử dụng; (4) Các chức năng để quản lý các tài khoản của người sử dụng; (5) Các chức năng để thực hiện các hành vi liên quan đến tài khoản; (6) Các chức năng để quản lý và sử dụng các tài khoản; (7) Các chức năng để thực hiện các hành vi liên quan đến tài khoản; (8) Các chức năng để quản lý tài khoản và các quyền của các người sử dụng...'' \textit{(lặp lại không có nội dung thực chất)}
+
+\textbf{Hybrid Search:} ``Theo quy định của Ngân hàng Nhà nước, phần mềm Online Banking phải có những chức năng bảo mật tối thiểu bao gồm: (1) Kiểm tra tính xác thực của người dùng: đảm bảo chỉ người được phép đăng nhập mới có thể truy cập, thông qua các phương thức xác thực như mật khẩu, mã OTP, hoặc xác thực sinh trắc học; (2) Hệ thống bảo mật dữ liệu: bảo vệ dữ liệu người dùng khỏi việc xâm nhập, sao chép hoặc thay đổi thông tin, sử dụng các biện pháp như mã hóa dữ liệu và kiểm soát truy cập; (3) Quản lý quyền truy cập: thiết lập và duy trì quyền truy cập của người dùng theo cấp độ; (4) Chức năng ghi nhật ký và ghi nhận hành động: ghi lại các hành động của người dùng, giúp theo dõi và xác minh các hoạt động trong hệ thống.''
+
+\textbf{Hybrid Search + Rerank:} ``Từ ngày 1/1/2025, theo quy định của Ngân hàng Nhà nước, phần mềm Online Banking phải có những chức năng bảo mật tối thiểu bao gồm: (1) Kiểm tra xác thực người dùng: người dùng phải xác thực thông tin cá nhân để đảm bảo chỉ có người có quyền truy cập mới sử dụng dịch vụ; (2) Bảo mật dữ liệu: dữ liệu giao tiếp giữa người dùng và hệ thống phải được mã hóa, đảm bảo dữ liệu không bị xâm nhập hoặc thay đổi khi truyền qua mạng; (3) Lưu trữ và xử lý dữ liệu an toàn: dữ liệu được lưu trữ trong hệ thống phải được mã hóa và có thể sao lưu định kỳ để đảm bảo tính toàn vẹn; (4) Quản lý quyền truy cập: hệ thống phải có cơ chế xác định và kiểm soát quyền truy cập của từng người dùng, đảm bảo chỉ người có quyền mới có thể tiếp cận dữ liệu hoặc chức năng cần thiết.''
+
+\textbf{Nhận xét:} Baseline liệt kê các chức năng chung chung, lặp lại và không có nội dung thực chất. Cả Hybrid Search và Hybrid Search + Rerank đều cho câu trả lời hợp lý và đúng lĩnh vực, với Hybrid Search + Rerank nêu được thêm yếu tố mã hóa khi truyền qua mạng -- gần với ground truth hơn. Tuy nhiên cả hai vẫn chưa liệt kê đủ 8 chức năng bắt buộc theo thông tư do giới hạn tổng hợp của LLM 1.7B tham số.
+
+%----------------------------------------------------------
+% TỔNG KẾT DEMO
+%----------------------------------------------------------
+\subsection*{Tổng kết}
+
+Qua 5 câu hỏi demo trên, có thể rút ra một số nhận xét tổng quát:
+
+\begin{itemize}
+    \item \textbf{Baseline (Qwen1.5-1.8B):} Thất bại nghiêm trọng ở hầu hết các câu hỏi -- sinh văn bản bằng tiếng Trung/Hàn, hallucination nặng, lặp lại nội dung vô nghĩa, hoàn toàn không bám sát ngữ cảnh được cung cấp.
+    \item \textbf{Hybrid Search:} Cải thiện đáng kể, câu trả lời đúng ngôn ngữ và đúng lĩnh vực. Tuy nhiên vẫn có trường hợp lấy nhầm ngữ cảnh (câu hỏi 3 -- nhầm sang lĩnh vực hàng hải) do BM25 khớp từ khóa sai.
+    \item \textbf{Hybrid Search + Rerank:} Nhìn chung cho kết quả tốt nhất, đặc biệt ở khả năng lọc ngữ cảnh nhiễu (câu hỏi 3). Hạn chế còn lại chủ yếu đến từ năng lực tổng hợp của LLM nhỏ (1.7B tham số), không phải từ chất lượng retrieval.
+\end{itemize}
